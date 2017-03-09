@@ -40,6 +40,7 @@ Upload.prototype={
 		var modal='<div class="img-fix">'+
 					'<div class="fix"></div>'+
 					'<div>'+
+						'<span class="close" style="position: absolute;right:10px;top:5px;cursor:pointer">X</span>'+
 						'<div class="clearfix allImg firstFolder" style="padding-top:31px">'+
 						'</div>'+
 						'<div class="clearfix allImg secondFolder">'+
@@ -68,6 +69,9 @@ Upload.prototype={
 		$('.allImg').on("click", ".return",function() {
 			$('.allImg').hide();
 			$(this).parent().prev().show();
+		})
+		$('.close').click(function(){
+			$('.img-fix').click();
 		})
 
 		this.addTitlePic();
@@ -185,7 +189,7 @@ AddToshop.prototype={
 			if ($('.file_view').length == 4){
 				$('.pd_img_list').append(imgItem);
 			}else{
-				$('.file_view').last().find('img').attr('src',data.imgUrl);
+				$('.file_view').last().find('img').attr('src',data.imgUrl).css('display','inline');
 			}
 			$('.file_view').unbind('click');
 			$('.file_view').click(function(){
