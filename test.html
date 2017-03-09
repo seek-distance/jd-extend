@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		/* CSS Document */
+		body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td{margin:0;padding:0;box-sizing: border-box;}
+		table{border-collapse:collapse;border-spacing:0;}
+		fieldset,img{border:0;}
+		address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}
+		ol,ul{list-style:none;}
+		caption,th{text-align:left;}
+		h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}
+		q:before,q:after{content:;}
+		abbr,acronym{border:0;}
+		body{color:#666;background-color:#fff;font:12px/1.5 "微软雅黑",tahoma,arial,'Hiagino Sans GB',宋体,sans-serif;}
+		.clearfix:after{content:" ";clear:both; height:0; visibility:hidden;display:block;font-size:0;}
+		.clearfix{zoom:1;}
+		
+		::-webkit-scrollbar {
+		    width: 0px
+		}
+.addPic{	
+	position: absolute;
+	left: 370px;
+	top: 23px;
+}
+
+.img-fix{
+	background: rgba(255, 255, 255, 0.5);
+	height: 100%;
+	position: fixed;
+	width: 100%;
+	top: 0;
+	display: block;
+}
+.img-fix>div{			
+	width: 80%;
+	margin: 0 auto;
+	padding:10px 0 20px;
+	background: #32323A;
+	border-radius: 3px;
+	height: 80%;
+	overflow: auto;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+.allImg{
+	width: 90%;
+	margin: 0 auto;
+}
+.folder{
+	text-align: center;
+	font-size: 16px;
+}
+.img-item{
+	border: 1px solid #DDEBFD;
+	width: 31%;
+	padding: 10px 0;
+	float: left;
+	margin:1.5% 2% 0 0;
+	background: #fff;
+	height: 211.6px;
+}
+.img-item img,.img-item .titlePic-btn{
+	width: 90%;
+	margin: 0 auto;
+	display: block;
+}
+.img-item .titlePic-btn{
+	margin-top: 10px;
+}
+.img-item img{
+	height: 150px;
+}
+	</style>
+	<script src='js/jquery.js'></script>
+</head>
+<body>
+	<div class="img-fix">
+		<div>
+			<div class="clearfix allImg">
+				<div class="img-item">
+					<img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1488912050616&di=552b53f71de4757cd9259f828c2e1e12&imgtype=0&src=http%3A%2F%2Fpic.58pic.com%2F58pic%2F15%2F30%2F51%2F01Z58PICyq9_1024.jpg">
+					<div class="folder">文件名</div>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+				<div class="img-item">
+					<img src="2.jpg">
+					<button class="titlePic-btn">作为封面图</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		$('.img-fix').click(function(){
+			$(this).hide();
+		})
+		$('.allImg').click(function(event){
+			event.stopPropagation();
+		})
+	</script>
+</body>
+</html>

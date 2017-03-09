@@ -1,0 +1,20 @@
+{
+    "name": "jd-extend",
+    "version": "1.0",
+    "manifest_version": 2,
+    "description": "The first extension that I made.",
+    "author": "心向远方",
+    "background": {
+        "scripts": ["js/jquery.js", "js/background.js"]
+    },
+    "content_scripts": [{
+        "matches": ["*://dr.jd.com/page/find_list*"],
+        "js": ["js/jquery.js", "js/current.js"],
+        "css": ["css/current.css"]
+    }],
+    "browser_action": {
+        "default_icon": "img/icon.png",
+        "default_popup": "popup.html"
+    },
+    "permissions": ["tabs","cookies","http://*/*"]
+}
