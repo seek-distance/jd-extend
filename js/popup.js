@@ -27,6 +27,7 @@ var ShopList=function() {
                         '</p>'+
                     '</div>'+
                  '</li>';
+    this.thorCookie;
 }
 ShopList.prototype={
 	getThorCookie:function() {
