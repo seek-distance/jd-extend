@@ -26,7 +26,7 @@ getData={
 var Upload=function(){
 	this.imgFirstUrl='http://jddr.jymao.com/';
 	this.imgTpl='<div class="img-item">'+
-					'<img src="'+this.imgFirstUrl+'#{key}">'+
+					'<img class="titlePic" src="'+this.imgFirstUrl+'#{key}">'+
 					'<button class="b titlePic-btn">作为封面图</button>'+
 				'</div>';
 	this.folderTpl='<div class="img-item folder">'+
@@ -92,6 +92,9 @@ Upload.prototype={
 					$('.titlePicUrl .del_img').addClass('show');
 				}				
 			})
+		})
+		$('.allImg').on('click','.titlePic',function(){
+			$(this).siblings('.titlePic-btn').click();
 		})
 		$('.allImg').on('click','.folder',function(){
 			$(".allImg").hide();
