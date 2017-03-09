@@ -163,18 +163,18 @@ body {
     top: 30px;
     z-index: 99;
     display: none;
+    height: 100%;
+    width: 100%;
 }
 
 .reload-fix {
-    height: 455px;
-    width: 320px;
     background: rgba(255, 255, 255, 0.5) url('../img/load.gif') no-repeat center center;
 }
 
 .message-fix>div {
     position: relative;
-    height: 455px;
-    width: 320px;
+    height: 100%;
+    width: 100%;
     background: rgba(0, 0, 0, 0.5);
 }
 

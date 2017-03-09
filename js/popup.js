@@ -2,10 +2,10 @@ ajax={
 	shopList:function(option){
 		return $.get("http://www.jymao.com/ds/jddr/list",option);
 	},
-	shopMessage:function(option){
+	shopDetail:function(option){
 		return $.get("http://www.jymao.com/ds/jddr/commodity-detail",option);
 	},
-	repeatStr:function(str, data) {
+	replaceStr:function(str, data) {
 	    var s = str.replace(/#\{(.*?)\}/ig, function(match, value) {
 	        return data[value] || "";
 	    })
@@ -17,56 +17,104 @@ var ShopList=function() {
 	this.bg = chrome.extension.getBackgroundPage();
 	this.shopTpl='<li class="clearfix">'+
                     '<div class="shop-img">'+
-                        '<a href="#{link}" target="_blank"><img src="#{imgUrl}"></a>'+                    
+                        '<a href="http:#{link}" target="_blank"><img src="http://m.360buyimg.com/#{imgUrl}"></a>'+                    
                     '</div>'+
                     '<div class="shop-detail">'+
-                        '<p class="shop-title"><a href="#{link}" target="_blank">#{name}</a></p>'+
+                        '<p class="shop-title"><a href="http:#{link}" target="_blank">#{name}</a>佣金：¥<span>#{cpsPrice}</span></p>'+
                         '<p class="shop-price">'+
-                            '¥<span>259.00</span>'+
-                            '<button class="fr addToPic">加入商品</button>'+
+                            '¥<span>#{price}</span>'+
+                            '<button data-id="#{id}" data-imgUrl="#{imgUrl}" class="fr addToPic">加入商品</button>'+
                         '</p>'+
                     '</div>'+
                  '</li>';
-    this.thorCookie;
 }
 ShopList.prototype={
 	getThorCookie:function() {
 		var self=this;
 		this.bg.getThorCookie(function(cookie) {
 			self.thorCookie=cookie.value;
-			console.log(self.thorCookie);
+			self.init();
+		});
+	},
+	init:function(){
+		var searchUrl = localStorage.getItem('searchUrl');
+		var shopList = localStorage.getItem('shopList');
+		var shopListTop = localStorage.getItem('shopListTop');
+		if (searchUrl) {
+			$('.search-input').val(searchUrl);
+		}
+		if (shopList) {
+			$('.shopList').html(shopList);
+		}
+		if (shopListTop) {
+			$('.shopList').scrollTop(shopListTop);
+		}
+	},
+	vaild:function(){
+		chrome.tabs.getSelected(null, function(tab) {
+			console.log(tab.url); 
+			if ( !(/http:\/\/dr.jd.com\/page\/find_list/.test(tab.url)) ) {
+				$('.message-fix').show();
+			}
 		});
 	},
 	addListener:function(){
+		var self=this;
+		$('.modal').click(function(){
+			$('.modal span').hide();
+		})
+
 		$('.search-input').keypress(function(e) {
 		    if (e.which == 13) {
 		        $('.fa-search').click();
 		    }
 		})
 		$('.fa-search').click(function() {
-			var self=this;
+			localStorage.setItem('searchUrl',$('.search-input').val());
+			$('.shopList').html("");
+			$('.reload-fix').show();
 			ajax.shopList({url:$('.search-input').val()}).then(function(data){
- 				console.log(data);
  				for (var i = 0; i < data.length; i++) {
  					var option={
- 						link:data[i].link,
- 						name:data[i].name,
+ 						link:data[i].link
  					}
  					var startIndex = data[i].link.lastIndexOf('/');
  					var endIndex = data[i].link.lastIndexOf('.');
  					var id = data[i].link.slice(startIndex+1,endIndex);
- 					/*ajax.shopMessage({skuId:id,thorCookie:self.thorCookie}).then(function(data){
- 						console.log(data);
- 					})*/
+ 					self.showItem(option,id);
  				}
 			})
 		})
 
+		$('.shopList').on("click",".addToPic",function(){
+			self.bg.sendData({skuId:$(this).attr("data-id")});
+		})
+
+		$('.shopList').scroll(function(){
+			localStorage.setItem('shopListTop',$('.shopList').scrollTop());
+		})
+
+	},
+	showItem:function(option,id){
+		var self=this;
+		ajax.shopDetail({skuId:id,thorCookie:self.thorCookie}).then(function(value){
+			$('.reload-fix').hide();
+			option.id = value.skuID;
+			option.price = value.price;
+			option.cpsPrice = value.cpsPrice;
+			option.imgUrl = value.imgList[0];
+			option.name = value.title;
+			if (value.cpsPrice.trim() != '0') {
+				$('.shopList').append(ajax.replaceStr(self.shopTpl,option));
+				localStorage.setItem('shopList',$('.shopList').html());
+			}
+		})
 	}
 }
 
 var list=new ShopList();
 list.getThorCookie();
+list.vaild();
 list.addListener();
 
 

@@ -1,4 +1,3 @@
-var imgFirstUrl='http://jddr.jymao.com/';
 var allImg={imgPic:[]};
 var thorCookie;
 chrome.runtime.sendMessage("getThorCookie", function(cookie) {
@@ -13,6 +12,9 @@ getData={
 	upload:function(option){
 		return $.post('http://www.jymao.com/ds/jddr/upload',option);
 	},
+	fifthImg:function(option){
+		return $.get("http://www.jymao.com/ds/jddr/fifth-img",option);
+	},
 	repeatStr:function(str, data) {
 	    var s = str.replace(/#\{(.*?)\}/ig, function(match, value) {
 	        return data[value] || "";
@@ -21,9 +23,10 @@ getData={
 	}
 }
 
-var Upload=function(){	
+var Upload=function(){
+	this.imgFirstUrl='http://jddr.jymao.com/';
 	this.imgTpl='<div class="img-item">'+
-					'<img src="'+imgFirstUrl+'#{key}">'+
+					'<img src="'+this.imgFirstUrl+'#{key}">'+
 					'<button class="b titlePic-btn">作为封面图</button>'+
 				'</div>';
 	this.folderTpl='<div class="img-item folder">'+
@@ -33,7 +36,7 @@ var Upload=function(){
 }
 Upload.prototype={
 	addBtn:function(){
-		var btn='<button class="b addPic">显示图集</button>';
+		var btn='<button class="b addPic">从图集中选择</button>';
 		var modal='<div class="img-fix">'+
 					'<div class="fix"></div>'+
 					'<div>'+
@@ -75,13 +78,15 @@ Upload.prototype={
 		$('.allImg').on('click','.titlePic-btn',function(){
 			$('.fix').show();
 			getData.upload({fileUrl:$(this).siblings('img').attr('src'),thorCookie:thorCookie}).then(function(data){
-				$('.fix').hide();
-				$('.img-fix').fadeOut();
-				var value = data.result.slice(5);
-				$('.upload').removeClass('noImg');
-				$('.titlePicUrl').attr('src',value);
-				$('.titlePicUrl .img_wrap').addClass('show').find('img').attr('src',value);
-				$('.titlePicUrl .del_img').addClass('show');
+				if (data.success) {
+					$('.fix').hide();
+					$('.img-fix').fadeOut();
+					var value = data.result.slice(5);
+					$('.upload').removeClass('noImg');
+					$('.titlePicUrl').attr('src',value);
+					$('.titlePicUrl .img_wrap').addClass('show').find('img').attr('src',value);
+					$('.titlePicUrl .del_img').addClass('show');
+				}				
 			})
 		})
 		$('.allImg').on('click','.folder',function(){
@@ -155,9 +160,51 @@ Upload.prototype={
 	}
 }
 
+var AddToshop=function(){
+
+}
+AddToshop.prototype={
+	init:function(){
+		var self=this;
+		chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
+			if (message instanceof Object) {
+				self.message=message;
+				self.dealShop();
+			}
+		})
+	},
+	dealShop:function(){
+		var self=this;
+		if ( $('#pop').length==0 || $('#pop').css("display") == "none" ) {
+			$('.b-showpop').click();
+		}
+		$('.skuId').val(self.message.skuId);
+		$('.b-subSku').click();
+		getData.fifthImg({skuId:self.message.skuId}).then(function(data){
+			var imgItem='<div class="file_view"><img src="'+data.imgUrl+'" alt="" style="display: inline;"></div>';
+			if ($('.file_view').length == 4){
+				$('.pd_img_list').append(imgItem);
+			}else{
+				$('.file_view').last().find('img').attr('src',data.imgUrl);
+			}
+			$('.file_view').unbind('click');
+			$('.file_view').click(function(){
+				$(this).addClass('cur').siblings().removeClass('cur');
+			})
+		})		
+		
+	}
+}
+
+
+
 var upload=new Upload();
 upload.addBtn();
 upload.getPic();
+
+var addToshop = new AddToshop();
+addToshop.init();
+
 
 
 

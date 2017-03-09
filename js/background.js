@@ -2,13 +2,13 @@ function getThorCookie(cb) {
     chrome.tabs.getSelected(null, function(tab) {
         url = tab.url;
         chrome.cookies.get({ url: url, name: "thor" }, function(cookie) {
-            console.log(cookie);
             cb(cookie)
         })
     })
 }
 
 function sendData(data){
+    console.log(data);
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
         chrome.tabs.sendMessage(tabs[0].id, data, function(response) {
             //chrome.runtime.sendMessage(response);
