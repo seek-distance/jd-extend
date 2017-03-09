@@ -220,7 +220,7 @@ body {
 /* section */
 
 section {
-    height: 370px;
+    height: 450px;
     margin-top: 1px;
     overflow: auto;
 }
@@ -281,7 +281,7 @@ section {
 
 .shopList {
     overflow: auto;
-    height: 345px;
+    height: 425px;
 }
 
 .row li {
