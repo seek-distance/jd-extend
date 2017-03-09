@@ -70,6 +70,7 @@ ShopList.prototype={
 		    }
 		})
 		$('.fa-search').click(function() {
+			if ($('.search-input').val() != "")  return;
 			localStorage.setItem('searchUrl',$('.search-input').val());
 			$('.shopList').html("");
 			$('.reload-fix').show();
