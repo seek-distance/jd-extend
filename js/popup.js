@@ -1,9 +1,9 @@
 ajax={
 	shopList:function(option){
-		return $.get("http://www.jymao.com/ds/jddr/list",option);
+		return $.get("http://jddr-api.jymao.com/ds/jddr/list",option);
 	},
 	shopDetail:function(option){
-		return $.get("http://www.jymao.com/ds/jddr/commodity-detail",option);
+		return $.get("http://jddr-api.jymao.com/ds/jddr/commodity-detail",option);
 	},
 	replaceStr:function(str, data) {
 	    var s = str.replace(/#\{(.*?)\}/ig, function(match, value) {
@@ -17,16 +17,17 @@ var ShopList=function() {
 	this.bg = chrome.extension.getBackgroundPage();
 	this.shopTpl='<li class="clearfix">'+
                     '<div class="shop-img">'+
-                        '<a href="http:#{link}" target="_blank"><img src="http://m.360buyimg.com/#{imgUrl}"></a>'+                    
+                        '<a href="http:#{link}" target="_blank"><img src="http:#{imgUrl}"></a>'+                    
                     '</div>'+
                     '<div class="shop-detail">'+
-                        '<p class="shop-title"><a href="http:#{link}" target="_blank">#{name}</a>佣金：¥<span>#{cpsPrice}</span></p>'+
+                        '<p class="shop-title"><a href="http:#{link}" target="_blank">#{name}</a><span>#{cpsPrice}</span><span class="fr">#{shopName}</span></p>'+
                         '<p class="shop-price">'+
                             '¥<span>#{price}</span>'+
                             '<button data-id="#{id}" data-imgUrl="#{imgUrl}" class="fr addToPic">加入商品</button>'+
                         '</p>'+
                     '</div>'+
                  '</li>';
+    this.shopList={};	//去重存储对象
 }
 ShopList.prototype={
 	getThorCookie:function() {
@@ -60,8 +61,8 @@ ShopList.prototype={
 	},
 	addListener:function(){
 		var self=this;
-		$('.modal').click(function(){
-			$('.modal span').hide();
+		$('.modal span').click(function(){
+			$('.message-fix').hide();
 		})
 
 		$('.search-input').keypress(function(e) {
@@ -70,14 +71,19 @@ ShopList.prototype={
 		    }
 		})
 		$('.fa-search').click(function() {
-			if ($('.search-input').val() != "")  return;
+			if ($('.search-input').val() == "")  return;
 			localStorage.setItem('searchUrl',$('.search-input').val());
 			$('.shopList').html("");
 			$('.reload-fix').show();
-			ajax.shopList({url:$('.search-input').val()}).then(function(data){
+			self.shopList={};
+			ajax.shopList({url: escape($('.search-input').val()) }).then(function(data){
+				self.pageCount=data.pageCount;
+				var data = data.list;
  				for (var i = 0; i < data.length; i++) {
+ 					if(self.isOverInShop(data[i].shopName))	continue; 					
  					var option={
- 						link:data[i].link
+ 						link:data[i].link,
+ 						shopName:data[i].shopName
  					}
  					var startIndex = data[i].link.lastIndexOf('/');
  					var endIndex = data[i].link.lastIndexOf('.');
@@ -88,28 +94,53 @@ ShopList.prototype={
 		})
 
 		$('.shopList').on("click",".addToPic",function(){
-			self.bg.sendData({skuId:$(this).attr("data-id")});
+			self.bg.sendData({skuId:$(this).attr("data-id"),imgUrl:$(this).attr("data-imgUrl")});
 		})
 
 		$('.shopList').scroll(function(){
 			localStorage.setItem('shopListTop',$('.shopList').scrollTop());
+			setTimeout(function(){
+				if(self.checkSlide()){
+
+				}
+			},300)
 		})
 
 	},
 	showItem:function(option,id){
 		var self=this;
 		ajax.shopDetail({skuId:id,thorCookie:self.thorCookie}).then(function(value){
+			if(self.isOverInShop(value.brandName))	return;
 			$('.reload-fix').hide();
 			option.id = value.skuID;
 			option.price = value.price;
 			option.cpsPrice = value.cpsPrice;
-			option.imgUrl = value.imgList[0];
+			option.imgUrl = value.fifthImg;
 			option.name = value.title;
-			if (value.cpsPrice.trim() != '0') {
+			if (value.cpsPrice != '0') {
 				$('.shopList').append(ajax.replaceStr(self.shopTpl,option));
 				localStorage.setItem('shopList',$('.shopList').html());
 			}
 		})
+	},
+	isOverInShop:function(name){
+		var self=this;
+		if ( !self.shopList.hasOwnProperty(name) ) {
+			self.shopList[name] = 1;
+			return false;
+		}else{
+			if (self.shopList[name] < 3) {
+				self.shopList[name] += 1;
+				return false;
+			}else{
+				return true;
+			}
+		}
+	},
+	checkSlide:function() {
+	    var lastShopTop = $(".shopList li").last().get(0).offsetTop + ($(".shopList li").last().outerHeight()) / 2;
+	    var winH = $(".shopList").scrollTop() + $(".shopList").outerHeight();
+	    return (winH > lastShopTop) ? true : false;
 	}
 }
 
@@ -121,6 +152,7 @@ list.addListener();
 
 /*
 
+jddr-api.jymao.com
 接口:
 Get  /ds/jddr/list?url=商品列表链接
 返回: 没有过滤佣金的商品列表.  
@@ -143,7 +175,7 @@ GET  /ds/jddr/fifth-img
 例子: http://www.jymao.com/ds/jddr/fifth-img?skuId=2967929
 返回: {"imgUrl":"//img14.360buyimg.com/n5/s800x800_jfs/t3022/285/1692336013/79612/5109769a/57c8d86dN0de955b7.jpg"}
 
-summer的妈妈     loveyou321@ 
+summer的妈妈     loveyou321@
 后台：dr.jd.com
 
 */
@@ -169,4 +201,16 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse){
 alert(JSON.stringify(message)) //这里获取到消息值与名称
 })
 
+*/
+
+/*
+那个客户提了两个改进需求:
+1. 增加用户管理/登录
+2. 如果有下页的话, 自动翻页, 另外, 显示店铺名, 同一个店铺的商品不超过三个, 同一个品牌的商品不超过3个
+
+第一个我正在弄, 准备把上次的那个改改用上去.
+第二个你看看好改不? 评估下先
+
+/ds/jddr/commodity-detail 里添加了 品牌名称
+/ds/jddr/list 里添加了店铺名称
 */

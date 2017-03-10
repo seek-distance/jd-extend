@@ -10,10 +10,10 @@ getData={
 		return $.get('http://www.jymao.com/ds/qiniu/list?bucket=jddr',option);
 	},
 	upload:function(option){
-		return $.post('http://www.jymao.com/ds/jddr/upload',option);
+		return $.post('http://jddr-api.jymao.com/ds/jddr/upload',option);
 	},
 	fifthImg:function(option){
-		return $.get("http://www.jymao.com/ds/jddr/fifth-img",option);
+		return $.get("http://jddr-api.jymao.com/ds/jddr/fifth-img",option);
 	},
 	repeatStr:function(str, data) {
 	    var s = str.replace(/#\{(.*?)\}/ig, function(match, value) {
