@@ -30,7 +30,6 @@ gulp.task('concat-css',function(){
 		browers:['5%','Android >=2.3']
 	}))
 	.pipe(concat('all.css'))		//合并css并命名为all.css
-	.pipe(gulp.dest('dist/css'))	//目标路径
 
 	.pipe(minifyCss())			//压缩
 	.pipe(rename('all.min.css'))	//重命名
@@ -42,7 +41,6 @@ gulp.task('concat-js',function(){
 	gulp.src('src/js/*.js')
 	.pipe(plumber())
 	.pipe(concat('all.js'))		//合并js并命名为all.js
-	.pipe(gulp.dest('dist/js'))	//目标路径
 
 	.pipe(uglify())		//压缩
 	.pipe(rename('all.min.js'))		//重命名
