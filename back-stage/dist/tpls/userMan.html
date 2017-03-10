@@ -1,0 +1,27 @@
+<div class="userMan-content">
+	<div class="userMan-add">
+		<input type="text" ng-model="newUser" placeholder="请输入用户名">
+		<label>
+			<input ng-model="isadmin" type="checkbox">是否为管理员
+		</label>
+		<button ng-click="add()" class="btn btn-success">添加用户</button>
+	</div>
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>用户名</th>
+				<th>默认密码</th>
+				<th>角色</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="(key, v) in user">
+				<td ng-bind="v.name"></td>
+				<td ng-bind="v.defaultPassword"></td>
+				<td>{{v.role=="admin" ? "管理员":"普通用户"}}</td>
+				<td><span ng-click="del(key)" class="text-error">删除</span></td>
+			</tr>
+		</tbody>
+	</table>
+</div>

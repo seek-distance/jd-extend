@@ -1,0 +1,15 @@
+<div class="home-head">
+	<a ui-sref="home" class="home-title">后台管理</a>
+	<div class="home-user pull-right">
+		<span ng-bind="username"></span>
+		<a style="cursor: pointer;" ng-click="exit()" class="home-login">退出系统</a>
+		<a ui-sref="login({update:'update'})" ng-click="updatePwd()" class="home-login">修改密码</a>
+	</div>
+</div>
+<div class="container-fluid home-navContent">
+	<div class="row">
+		<div class="col-xs-3 col-md-2 home-nav pull-left" ui-view="nav"></div>
+		<div class="col-xs-9 col-md-10 col-md-offset-2 col-xs-offset-3 home-content pull-right" ui-view="content"></div>
+	</div>
+</div>
+
