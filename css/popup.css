@@ -126,8 +126,7 @@ button {
 html,
 body {
     font-size: 14px;
-    width: 240px;
-    height: 350px;
+    height: 575px;
 }
 
 
@@ -231,11 +230,13 @@ section {
 
 .page-item {
     transition: 0.3s;
-    width: 240px;
+    width: 100%;
+    /*240px;*/
     position: absolute;
     overflow: hidden;
     top: 30px;
     left: 0;
+    padding: .2rem .5rem;
 }
 
 .home {
@@ -255,7 +256,8 @@ section {
 /* shop-item-row */
 
 .row {
-    width: 240px;
+    width: 100%;
+    /*240px;*/
     overflow: auto;
 }
 
@@ -265,7 +267,7 @@ section {
 
 .search input {
     width: 100%;
-    height: 25px;
+    height: 35px;
     padding: 0 32px 0 5px;
     margin: 3px 0;
 }
@@ -274,14 +276,14 @@ section {
     position: absolute;
     font-size: 20px;
     right: 5px;
-    top: 5px;
+    top: 10px;
     height: 25px;
     cursor: pointer;
 }
 
 .shopList {
     overflow: auto;
-    height: 425px;
+    height: 475px;
 }
 
 .row li {
@@ -305,7 +307,7 @@ section {
 .row .shop-detail {
     width: calc(100% - 90px);
     font-size: 12px;
-    height: 80px;
+    height: 90px;
     border-bottom: 1px solid #e6e6e6;
     margin-left: 5px;
 }
@@ -316,8 +318,8 @@ section {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    height: 34.4px;
-    margin: 10px 0;
+    height: 44.4px;
+    margin: 5px 0;
 }
 
 .row .shop-title a {
@@ -329,6 +331,10 @@ section {
 }
 
 .row .shop-price {
+    color: #f23030;
+}
+
+.row .cps-price {
     color: #f23030;
 }
 
@@ -345,3 +351,168 @@ section {
     color: #ff4400;
 }
 
+.shopName {
+    margin-top: 0rem;
+    font-size: .8rem;
+    color: grey;
+}
+
+
+/* user */
+
+.user {
+    transform: translateX(0px);
+    z-index: 0;
+    background: white;
+}
+
+.user-left {
+    color: #000;
+}
+
+.user ul {
+    padding: 10px;
+}
+
+.user li,
+.user i {
+    line-height: 36px;
+}
+
+.user li {
+    border-bottom: 1px solid rgba(51, 51, 51, 0.3);
+}
+
+.user li:last-child {
+    border: none;
+}
+
+
+/* lose */
+
+.lose-title {
+    cursor: pointer;
+}
+
+.lose-content {
+    margin-bottom: 10px;
+    display: none;
+}
+
+.lose-content span {
+    width: 30%;
+    text-align: right;
+}
+
+.lose-content input {
+    margin-top: 8px;
+    height: 24px;
+}
+
+.error,
+.password-error {
+    color: #f23030;
+    margin-left: 100px;
+    line-height: 25px;
+    display: none;
+}
+
+.success {
+    color: green;
+    margin-left: 100px;
+    line-height: 25px;
+    display: none;
+}
+
+.changeBtn {
+    width: 90px;
+    height: 35px;
+    border: 1px solid #333;
+    background: #333;
+    color: #fff;
+    margin-left: 88px;
+    cursor: pointer;
+    outline: none;
+}
+
+.login {
+    background: white;
+    height: 500px;
+    z-index: 2;
+    display: none;
+}
+
+
+/* footer */
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #e6e6e6;
+    cursor: pointer;
+    background: #fff;
+    z-index: 10;
+}
+
+footer .nav-item {
+    border-right: 1px solid #e6e6e6;
+    width: 50%;
+    text-align: center;
+    font-size: 12px;
+    padding-top: 3px;
+}
+
+footer .nav-item:hover,
+footer .nav-item.on {
+    background-color: #333;
+    color: #fff;
+}
+
+footer .nav-item:last-child {
+    border: 0;
+}
+
+footer .nav-item i {
+    font-size: 20px;
+}
+
+form {
+    padding: 1rem;
+}
+
+form .form-group {
+    padding: .5rem 0;
+    height: 3rem;
+}
+
+form label {
+    width: 5rem;
+    display: inline-block;
+}
+
+form input {
+    width: calc(100% - 6rem);
+    height: 2rem;
+    padding: 0 .5rem;
+    font-size: 1.1rem;
+}
+
+form > button {
+    margin-top: 1rem;
+}
+
+.btn {
+    width: 100%;
+    height: 2rem;
+    border: 1px solid #333;
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+    outline: none;
+    font-size: 1rem;
+}
+
+.btn:hover {
+    background: #222
+}

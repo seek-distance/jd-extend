@@ -27,7 +27,7 @@
                     <i class="fa fa-search" aria-hidden="true"></i>
                 </div>
                 <ul class="shopList">
-                   <!-- <li class="clearfix">
+                    <!-- <li class="clearfix">
                        <div class="shop-img">
                            <a href=""><img src="shop1.jpg"></a>                        
                        </div>
@@ -44,12 +44,86 @@
                        </div>
                    </li> -->
                 </ul>
-            </div>            
+            </div>
+        </div>
+        <div class="user page-item">
+            <ul>
+
+                <li class="clearfix">
+                    <span class="user-left fl">用户名</span>
+                    <span class="fr my-name"></span>
+                </li>
+
+                <li>
+                    <div class="lose-title clearfix">
+                        <span class="fl user-left">修改密码</span>
+                        <i class="fa fa-angle-down fr" aria-hidden="true"></i>
+                    </div>
+                    <dd class="lose-content">
+                        <dl class="clearfix">
+                            <span class="fl">原密码：</span>
+                            <input class="fl old-pwd" type="text">
+                        </dl>
+                        <dl class="clearfix">
+                            <span class="fl">新密码：</span>
+                            <input class="fl pwd" type="password">
+                        </dl>
+                        <dl class="clearfix">
+                            <span class="fl">确认密码：</span>
+                            <input class="fl confirm-pwd" type="password">
+                        </dl>
+                        <dl class="error-item">
+                            <p class="error">密码错误</p>
+                        </dl>
+                        <dl class="success-item">
+                            <p class="success"></p>
+                        </dl>
+                        <dl>
+                            <button class="changeBtn">确定修改</button>
+                        </dl>
+                    </dd>
+                </li>
+
+                <li>
+                    <button class="btn logoutBtn" type="">退出登录</button>
+                </li>
+
+            </ul>
+        </div>
+        <div class="page-item login">
+            <form>
+                <div class="form-group user-name">
+                    <label for="user-name">用户名</label>
+                    <input autofocus required type="text" name="" value="">
+
+                </div>
+
+                <div class="form-group password">
+                    <label for="password">密码</label>
+                    <input required type="password" name="" value="">
+                    <p class="password-error"></p>
+                </div>
+
+
+                <button class="btn loginBtn">登录</button>
+            </form>
         </div>
     </section>
+    <footer>
+        <ul class="clearfix">
+            <li class="nav-item fl on home-item">
+                <i class="fa fa-home" aria-hidden="true"></i>
+                <p>首页</p>
+            </li>
+            <li class="nav-item fl user-item">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                <p>个人中心</p>
+            </li>
+        </ul>
+    </footer>
+
     <script src="js/jquery.js"></script>
     <script src="js/popup.js"></script>
-    </div>
 </body>
 
 </html>

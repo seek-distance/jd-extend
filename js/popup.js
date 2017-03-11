@@ -1,154 +1,406 @@
-ajax={
-	shopList:function(option){
-		return $.get("http://jddr-api.jymao.com/ds/jddr/list",option);
-	},
-	shopDetail:function(option){
-		return $.get("http://jddr-api.jymao.com/ds/jddr/commodity-detail",option);
-	},
-	replaceStr:function(str, data) {
-	    var s = str.replace(/#\{(.*?)\}/ig, function(match, value) {
-	        return data[value] || "";
-	    })
-	    return s;
-	}
+ajax = {
+    shopList: function(option) {
+        return $.get("http://jddr-api.jymao.com/ds/jddr/list", option);
+    },
+    shopDetail: function(option) {
+        return $.get("http://jddr-api.jymao.com/ds/jddr/commodity-detail", option);
+    },
+    replaceStr: function(str, data) {
+        var s = str.replace(/#\{(.*?)\}/ig, function(match, value) {
+            return data[value] || "";
+        })
+        return s;
+    }
 }
 
-var ShopList=function() {
-	this.bg = chrome.extension.getBackgroundPage();
-	this.shopTpl='<li class="clearfix">'+
-                    '<div class="shop-img">'+
-                        '<a href="http:#{link}" target="_blank"><img src="http:#{imgUrl}"></a>'+                    
-                    '</div>'+
-                    '<div class="shop-detail">'+
-                        '<p class="shop-title"><a href="http:#{link}" target="_blank">#{name}</a><span>#{cpsPrice}</span><span class="fr">#{shopName}</span></p>'+
-                        '<p class="shop-price">'+
-                            '¥<span>#{price}</span>'+
-                            '<button data-id="#{id}" data-imgUrl="#{imgUrl}" class="fr addToPic">加入商品</button>'+
-                        '</p>'+
-                    '</div>'+
-                 '</li>';
-    this.shopList={};	//去重存储对象
+var ShopList = function() {
+    this.bg = chrome.extension.getBackgroundPage();
+    this.shopTpl = '<li class="clearfix commodity-item">' +
+        '<div class="shop-img">' +
+        '<a href="http:#{link}" target="_blank"><img src="http:#{imgUrl}"></a>' +
+        '</div>' +
+        '<div class="shop-detail">' +
+        '<p class="shop-title"><a href="http:#{link}" target="_blank">#{name}</a><span class="cps-price">佣金:¥#{cpsPrice}</span><span class="fr shopName">#{shopName}</span></p>' +
+        '<p class="shop-price">' +
+        '¥<span>#{price}</span>' +
+        '<button data-id="#{id}" data-imgUrl="#{imgUrl}" data-fifthImg="#{fifthImg}" class="fr addToPic">加入清单</button>' +
+        '</p>' +
+        '</div>' +
+        '</li>';
+    this.shopList = {};
+    this.brandList = {};
 }
-ShopList.prototype={
-	getThorCookie:function() {
-		var self=this;
-		this.bg.getThorCookie(function(cookie) {
-			self.thorCookie=cookie.value;
-			self.init();
-		});
-	},
-	init:function(){
-		var searchUrl = localStorage.getItem('searchUrl');
-		var shopList = localStorage.getItem('shopList');
-		var shopListTop = localStorage.getItem('shopListTop');
-		if (searchUrl) {
-			$('.search-input').val(searchUrl);
-		}
-		if (shopList) {
-			$('.shopList').html(shopList);
-		}
-		if (shopListTop) {
-			$('.shopList').scrollTop(shopListTop);
-		}
-	},
-	vaild:function(){
-		chrome.tabs.getSelected(null, function(tab) {
-			console.log(tab.url); 
-			if ( !(/http:\/\/dr.jd.com\/page\/find_list/.test(tab.url)) ) {
-				$('.message-fix').show();
-			}
-		});
-	},
-	addListener:function(){
-		var self=this;
-		$('.modal span').click(function(){
-			$('.message-fix').hide();
-		})
+ShopList.prototype = {
+    getThorCookie: function() {
+        var self = this;
+        this.bg.getThorCookie(function(cookie) {
+            self.thorCookie = cookie.value;
+            self.init();
+        });
+    },
+    init: function() {
 
-		$('.search-input').keypress(function(e) {
-		    if (e.which == 13) {
-		        $('.fa-search').click();
-		    }
-		})
-		$('.fa-search').click(function() {
-			if ($('.search-input').val() == "")  return;
-			localStorage.setItem('searchUrl',$('.search-input').val());
-			$('.shopList').html("");
-			$('.reload-fix').show();
-			self.shopList={};
-			ajax.shopList({url: escape($('.search-input').val()) }).then(function(data){
-				self.pageCount=data.pageCount;
-				var data = data.list;
- 				for (var i = 0; i < data.length; i++) {
- 					if(self.isOverInShop(data[i].shopName))	continue; 					
- 					var option={
- 						link:data[i].link,
- 						shopName:data[i].shopName
- 					}
- 					var startIndex = data[i].link.lastIndexOf('/');
- 					var endIndex = data[i].link.lastIndexOf('.');
- 					var id = data[i].link.slice(startIndex+1,endIndex);
- 					self.showItem(option,id);
- 				}
-			})
-		})
+        var searchUrl = this.url = localStorage.getItem('searchUrl');
+        var shopList = localStorage.getItem('shopList');
+        var shopListTop = localStorage.getItem('shopListTop');
+        if (searchUrl) {
+            $('.search-input').val(searchUrl);
+        }
+        if (shopList) {
+            $('.shopList').html(shopList);
+        }
+        if (shopListTop) {
+            $('.shopList').scrollTop(shopListTop);
+        }
+    },
+    vaild: function() {
+        chrome.tabs.getSelected(null, function(tab) {
+            console.log(tab.url);
+            if (!(/http:\/\/dr.jd.com\/page\/find_list/.test(tab.url))) {
+                $('.message-fix').show();
+            }
+        });
+    },
+    fetchList: function(url) {
+        var self = this;
+        console.log("fetch list:", url)
 
-		$('.shopList').on("click",".addToPic",function(){
-			self.bg.sendData({skuId:$(this).attr("data-id"),imgUrl:$(this).attr("data-imgUrl")});
-		})
+        ajax.shopList({ url: escape(url) }).then(function(data) {
+            self.pageCount = data.pageCount;
+            console.log("pageCount:", self.pageCount)
+            var data = data.list;
+            if (!data.length) {
+                $(".reload-fix").hide();
+                $('.shopList').append("<p>该链接下没有找到商品</p>");
+                return;
+            }
+            //show all at first
+            data.forEach(function(item, idx) {
 
-		$('.shopList').scroll(function(){
-			localStorage.setItem('shopListTop',$('.shopList').scrollTop());
-			setTimeout(function(){
-				if(self.checkSlide()){
+                var startIndex = item.link.lastIndexOf('/');
+                var endIndex = item.link.lastIndexOf('.');
+                var id = item.link.slice(startIndex + 1, endIndex);
+                item.skuId = id;
+                if (self.deduper.hasOne(id)) {
+                    console.log("dup is found:", id, item.link, item.shopName);
+                    next();
+                } else {
+                    self.deduper.addOne(id);
+                    //                    self.showItemFast(item, id);
+                    self.showItemDetail(item, item.skuId);
 
-				}
-			},300)
-		})
+                }
+            })
 
-	},
-	showItem:function(option,id){
-		var self=this;
-		ajax.shopDetail({skuId:id,thorCookie:self.thorCookie}).then(function(value){
-			if(self.isOverInShop(value.brandName))	return;
-			$('.reload-fix').hide();
-			option.id = value.skuID;
-			option.price = value.price;
-			option.cpsPrice = value.cpsPrice;
-			option.imgUrl = value.fifthImg;
-			option.name = value.title;
-			if (value.cpsPrice != '0') {
-				$('.shopList').append(ajax.replaceStr(self.shopTpl,option));
-				localStorage.setItem('shopList',$('.shopList').html());
-			}
-		})
-	},
-	isOverInShop:function(name){
-		var self=this;
-		if ( !self.shopList.hasOwnProperty(name) ) {
-			self.shopList[name] = 1;
-			return false;
-		}else{
-			if (self.shopList[name] < 3) {
-				self.shopList[name] += 1;
-				return false;
-			}else{
-				return true;
-			}
-		}
-	},
-	checkSlide:function() {
-	    var lastShopTop = $(".shopList li").last().get(0).offsetTop + ($(".shopList li").last().outerHeight()) / 2;
-	    var winH = $(".shopList").scrollTop() + $(".shopList").outerHeight();
-	    return (winH > lastShopTop) ? true : false;
-	}
+            //get details to do filter
+            /*
+            var idx = 0;
+            var $items = $(".commodity-item");
+            next();
+
+            function next() {
+                if (idx >= $items.length) {
+                    return;
+                }
+
+                var $item = $($items[idx]);
+                var item = data[idx];
+                idx++;
+                console.log(item);
+                self.showItemDetail(item, item.skuId, $item, next);
+            }
+            */
+        })
+    },
+    addListener: function() {
+        var self = this;
+        $('.modal span').click(function() {
+            $('.message-fix').hide();
+        })
+
+        $('.search-input').keypress(function(e) {
+            if (e.which == 13) {
+                $('.fa-search').click();
+            }
+        })
+        $('.fa-search').click(function() {
+            if ($('.search-input').val() == "") return;
+            self.url = $('.search-input').val();
+
+            if (self.url.indexOf("page=") === -1) {
+                self.url = self.url.replace(/\?/, "?page=1&");
+            }
+
+            self.deduper = makeDedupObj();
+
+            localStorage.setItem('searchUrl', self.url);
+
+            $('.shopList').html("");
+            $('.reload-fix').show();
+            self.shopList = {};
+            self.brandList = {};
+
+            self.pageIdx = getPageIdx(self.url);
+            console.log("start page at idx:", self.pageIdx);
+            self.fetchList(self.url);
+        })
+
+        $('.shopList').on("click", ".addToPic", function() {
+            self.bg.sendData({
+                skuId: $(this).attr("data-id"),
+                imgUrl: $(this).attr("data-imgUrl"),
+                fifthImg: $(this).attr("data-fifthImg")
+            });
+        })
+
+        $('.shopList').scroll(function() {
+            localStorage.setItem('shopListTop', $('.shopList').scrollTop());
+        });
+        // $('.shopList').scroll(function() {
+        //     localStorage.setItem('shopListTop', $('.shopList').scrollTop());
+        //     if (timer) {
+        //         return;
+        //     }
+        //     var timer = setTimeout(function() {
+        //         timer = null;
+        //         if (self.checkSlide()) {
+        //             if (self.pageIdx >= self.pageCount) {
+        //                 console.log("no more page");
+        //                 return;
+        //             }
+        //             //next page
+        //             var nextPageNum;
+        //             self.pageIdx++;
+        //             if (self.url.indexOf("search.jd.com") !== -1) {
+        //                 nextPageNum = self.pageIdx * 2 - 1;
+        //             } else {
+        //                 nextPageNum = self.pageIdx;
+        //             }
+        //             console.log("go to page:", nextPageNum);
+        //             self.url = self.url.replace(/page=[0-9]*/i, "page=" + nextPageNum);
+        //             self.fetchList(self.url);
+        //         }
+        //     }, 300)
+        //})
+
+    },
+    /*showItemFast: function(option, id) {
+        $('.reload-fix').hide();
+        option.id = id;
+        option.cpsPrice = "获取中...";
+        option.price = "获取中..."
+
+        $('.shopList').append(ajax.replaceStr(this.shopTpl, option));
+        localStorage.setItem('shopList', $('.shopList').html());
+    },*/
+    showItemDetail: function(option, id, next) {
+        var self = this;
+
+        ajax.shopDetail({ skuId: id, thorCookie: self.thorCookie }).then(function(value) {
+
+            //next && next();
+
+            function clearItem() {
+                // console.log("clear item", id);
+                //    $item.remove();
+            }
+
+            option.id = value.skuID;
+            option.price = value.price;
+            option.cpsPrice = value.cpsPrice;
+            option.name = value.title;
+            option.imgUrl = "//m.360buyimg.com/" + value.imgList[0]
+            if (value.cpsPrice != '0') {
+                if (self.isOver3(self.shopList, option.shopName)) {
+                    console.log("ignore item with shopName:", option.shopName);
+                    clearItem();
+                    return;
+                }
+
+                $.get(host + "/ds/jddr/commodity-more-details", {
+                    skuId: id
+                }).then(function(data) {
+                    if (self.isOver3(self.brandList, data.brandName)) {
+                        console.log("ignore item with brandName: ", data.brandName);
+                        clearItem();
+                        return;
+                    }
+                    option.fifthImg = data.fifthImg;
+                    // console.log("replace commodity item")
+                    // $item.replaceWith(ajax.replaceStr(self.shopTpl, option));
+                    $('.shopList').append(ajax.replaceStr(self.shopTpl, option));
+                    localStorage.setItem('shopList', $('.shopList').html());
+                    $('.reload-fix').hide();
+
+                }, function(err) {
+                    console.log("failed to get more details: ", err);
+                    clearItem();
+                })
+            } else {
+                clearItem();
+            }
+        }, function(err) {
+            //  next && next();
+            console.log("failed to get details:", err)
+            clearItem();
+        })
+    },
+    isOver3: function(list, name) {
+        if (!name) {
+            return false;
+        }
+        list[name] = list[name] || 0;
+        list[name] += 1;
+
+        return list[name] > 3;
+    },
+    checkSlide: function() {
+        var $lastItem = $(".shopList li").last();
+        if ($lastItem.length === 0) {
+            return true;
+        }
+        var lastShopTop = $lastItem.get(0).offsetTop + ($lastItem.outerHeight()) / 2;
+
+        var winH = $(".shopList").scrollTop() + $(".shopList").outerHeight();
+
+        console.log("lastShopTop:", lastShopTop, "winH:", winH);
+        return (winH + 200 > lastShopTop) ? true : false;
+    }
 }
 
-var list=new ShopList();
+var list = new ShopList();
 list.getThorCookie();
 list.vaild();
 list.addListener();
 
+function getPageIdx(jdListUrl) {
+    var m = jdListUrl && jdListUrl.match(/page=([0-9]*)/i);
+    return (m && m[1]) || 0;
+}
+
+function makeDedupObj() {
+    var ids = {};
+
+    return {
+        reset: function() {
+            ids = {};
+        },
+        hasOne: function(id) {
+            return !!ids[id]
+        },
+        addOne: function(id) {
+            ids[id] = true;
+        }
+    }
+}
+
+//login
+var host = "http://jddr-api.jymao.com"
+$.get(host + "/ds/has-login")
+    .then(function(res) {
+        var hasLogin = res.hasLogin;
+        if (hasLogin) {
+            $(".my-name").text(res.name)
+            $(".page-item").show();
+            $(".login").hide();
+            //$(".nav-item.home-item").click();
+
+        } else {
+            $(".page-item").hide();
+            $(".login").show()
+        }
+    })
+
+$(".logoutBtn").click(function() {
+    $.post(host + "/ds/logout")
+        .then(function(res) {
+            $(".page-item").hide();
+            $(".login").show();
+
+        })
+})
+
+$(".login .password input").keyup(function() {
+    $(".password-error").text("").hide();
+})
+
+$(".loginBtn").click(function() {
+    var name = $(".login .user-name input").val();
+    var password = $(".login .password input").val();
+    $.post(host + "/ds/login", {
+        name: name,
+        password: password
+    }).then(function(res) {
+        if (res.msg === "login ok") {
+            $(".my-name").text(res.user && res.user.name)
+            $(".page-item").show();
+            $(".login").hide();
+            $(".nav-item.home-item").click();
+        }
+    }, function(err) {
+        var res = JSON.parse(err.responseText);
+        if (res.msg === "mismatch") {
+            $(".password-error").text("密码错误").show();
+        } else {
+            $(".password-error").text("登录失败").show();
+        }
+    })
+    return false;
+})
+
+/*底部导航点击*/
+$(".nav-item").click(function() {
+    $(".equal-header .page-name").text($(this).find("p").text());
+    if (!$(this).hasClass('on')) {
+        localStorage.setItem("navIndex", $(this).index());
+        $(this).addClass("on").siblings().removeClass("on");
+        if ($(this).hasClass('home-item')) {
+            $('.home').css('transform', 'translateX(0)');
+            $('.user').css('transform', 'translateX(320px)');
+        } else {
+            $('.user').css('transform', 'translateX(0)');
+            $('.home').css('transform', 'translateX(320px)');
+        }
+    }
+})
+
+/*忘记密码的展开*/
+$(".lose-title").click(function() {
+    $(".lose-content").slideToggle();
+    $(".success").hide();
+    $(".lose-content input").val("");
+})
+
+/*新密码校验*/
+$(".confirm-pwd").blur(function() {
+    if ($(this).val() != $('.pwd').val() || $(this).val() == "") {
+        $('.error').text('两次输入密码不一致').show();
+    } else {
+        $('.error').hide();
+    }
+})
+$(".pwd").blur(function() {
+    if ($('.confirm-pwd').val() != "" && $(this).val() != $('.confirm-pwd').val()) {
+        $('.error').text('两次输入密码不一致').show();
+    } else {
+        $('.error').hide();
+    }
+})
+
+$(".changeBtn").click(function() {
+    var oldPwd = $(".old-pwd").val();
+    var newPwd = $(".pwd").val();
+    var confirmPwd = $(".confirm-pwd").val();
+    if (newPwd === confirmPwd) {
+        $.post(host + "/ds/user/new-password", { newPwd: newPwd, oldPwd: oldPwd })
+            .then(function() {
+                $(".success").text("修改成功").show();
+                $(".lose-content input").val("");
+            }, function(err) {
+                $(".error").text("修改失败.").show();
+            })
+    }
+})
 
 /*
 
