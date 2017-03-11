@@ -96,6 +96,7 @@ app.controller('loginCtr',['$scope','$state','log','$stateParams',function($scop
 }]);
 app.controller('userManCtr',['$scope','user',function($scope,user){
 	$scope.user=[];
+	$scope.newUser="";
 	user.get().success(function(data){
 		$scope.user=data;
 	});
@@ -113,6 +114,10 @@ app.controller('userManCtr',['$scope','user',function($scope,user){
 	};
 
 	$scope.add=function(){
+		if ($scope.newUser === "") {
+			document.querySelector('.newUser').focus();
+			return;
+		}
 		var data={name:$scope.newUser};
 		if($scope.isadmin)	data.role='admin';
 		user.add(data).success(function(){

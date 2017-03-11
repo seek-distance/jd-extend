@@ -437,8 +437,8 @@ section {
 
 .login {
     background: white;
-    height: 500px;
-    z-index: 2;
+    height: 545px;
+    z-index: 11;
     display: none;
 }
 
