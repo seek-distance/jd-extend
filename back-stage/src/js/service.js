@@ -1,73 +1,74 @@
-app.factory('log', ['$http',function($http){
+app.constant('host', 'http://jddr-api.jymao.com');
+app.factory('log', ['$http','host',function($http,host){
 	return {
 		in:function(data){
 			return $http({
 				method:'post',
-				url:'http://jddr-api.jymao.com/ds/login',
+				url:host+'/ds/login',
 				data:data
 			});
 		},
 		out:function(){
 			return $http({
 				method:'post',
-				url:'http://jddr-api.jymao.com/ds/logout'
+				url:host+'/ds/logout'
 			});
 		},
 		vail:function(){
 			return $http({
 				method:'get',
-				url:'http://jddr-api.jymao.com/ds/has-login'
+				url:host+'/ds/has-login'
 			});
 		},
 		update:function(data){
 			return $http({
 				method:'post',
-				url:'http://jddr-api.jymao.com/ds/user/new-password',
+				url:host+'/ds/user/new-password',
 				data:data
 			});
 		}
 	};
 }]);
 
-app.factory('user', ['$http',function($http){
+app.factory('user', ['$http','host',function($http,host){
 	return{
 		get:function(){
 			return $http({
 				method:'get',
-				url:'http://jddr-api.jymao.com/ds/g/User'
+				url:host+'/ds/g/User'
 			});
 		},
 		del:function(data){
 			return $http({
 				method:'DELETE',
-				url:'http://jddr-api.jymao.com/ds/user',
+				url:host+'/ds/user',
 				data:data
 			});
 		},
 		add:function(data){
 			return $http({
 				method:'post',
-				url:'http://jddr-api.jymao.com/ds/user',
+				url:host+'/ds/user',
 				data:data
 			});
 		},
 		put:function(data){
 			return $http({
 				method:'PUT',
-				url:'http://jddr-api.jymao.com/ds/user/new-password',
+				url:host+'/ds/user/new-password',
 				data:data
 			});
 		}
 	};
 }]);
 
-app.factory('classify', ['$http',function($http){
-	var url='http://jddr-api.jymao.com/ds/category';
+app.factory('classify', ['$http','host',function($http,host){
+	var url=host+'/ds/category';
 	return {
 		get:function(){
 			return $http({
 				method:'get',
-				url:'http://jddr-api.jymao.com/ds/g/Category'
+				url:host+'/ds/g/Category'
 			});
 		},
 		update:function(data){
